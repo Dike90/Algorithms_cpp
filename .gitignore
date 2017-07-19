@@ -1,3 +1,8 @@
+#Global
+GPATH
+GRTAGS
+GTAGS
+
 # Compiled Object files
 *.slo
 *.lo
@@ -29,3 +34,4 @@
 *.app
 /build
 /algs4-data
+/.vscode
