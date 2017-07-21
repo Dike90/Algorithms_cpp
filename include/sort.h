@@ -3,10 +3,12 @@
 
 void exch(int* a , int i , int j)
 {
+    if(i==j) return; //如果i和j相等就什么都不做
     int temp = a[i];
     a[i] = a[j];
     a[j] = temp;
 }
+/***********************Selection Sort *************************/
 //largeW.txt 100W ints takes 1261.15s on i3-4150 ,win7 64 bits
 //for array length is N ,it needs N^2/2 times compare and N times exchange 
 void SelectionSort(int *a, int asize){
@@ -20,6 +22,9 @@ void SelectionSort(int *a, int asize){
         exch(a, min , i );
     }
 }
+
+
+/***********************Insertion Sort *************************/
 //largeW.txt 100W ints takes 1197.99s on i3-4150 ,win7 64 bits
 //average needs N^2/4 times compare and N^2/4 times exchange 
 //badest needs N^2/2 times compare and N^2/2 times exchange
@@ -31,6 +36,8 @@ void InsertionSort(int *a , int size){
         }
     }
 }
+
+/***********************Shell Sort *************************/
 //largeW.txt 100W ints takes  about 0.5s on i3-4150 ,win7 64 bits
 //思想是任意间隔h的数组都是有序的，这被称为h有序数组
 //算法的性能取决于所使用的递增序列，这里所使用的递增序列为1/2*(3^k -1) 1,4,13,40,...
@@ -49,6 +56,8 @@ void ShellSort(int* a , int size){
         h = h / 3; //最后一次循环h必等于1, 因为h = 3*h +1;
     }
 }
+
+/***********************Merge Sort *************************/
 //将两个有序数组，a[low..mid] a[mid+1..high] ,归并成一个有序数组。
 //数组a的左半部分和右半部分都是有序的。
 //先将将数组a复制到辅助数组aux中，然后将aux中的数按照适当的大小依次放入a中，
@@ -100,6 +109,66 @@ void MergeBUSort(int*a , int N){
         for(int lo = 0; lo < N - sz; lo += sz + sz )
             Merge(a , aux , lo , lo + sz -1 , (lo + 2*sz -1) < (N-1) ? (lo + 2*sz -1) :(N-1) );
     }
+}
+
+/***********************Quick Sort *************************/
+//largeW.txt 100W ints takes  about 0.165s on i3-4150 ,win7 64 bits
+//快速排序平均需要约2NlnN次比较，1/6NlnN次交换
+//最坏的情况是N^2/2次比较。但是这几乎不会发生，只要数据是随机的
+int Partition(int *a , int lo , int hi){
+    int i = lo , j = hi + 1;  //左右扫描指针
+    int temp = a[lo]; //切分元素 
+    while(true){
+        while( a[++i] < temp ) //从左侧开始搜索找到第一个大于切分元素的数就退出while,则当前i所指就是这个元素
+            if( i == hi) break;
+        while( a[--j] > temp)  //从右侧开始搜索找到第一个小于切分元素的数就退出while,则当前j所指就是这个元素
+            if( j == lo) break;
+        if( i >= j) break; //两个指针相遇，即数组扫描完毕。此时j所指向的元素一定是小于等于切分元素的。
+        exch( a , i ,j);   
+    }
+    exch( a , lo , j);  //将切分元素放到正确的位置
+    return j;  // 此时有a[lo...j-1] <= a[j] <= a[j+1...hi]; 返回
+}
+
+void RecursionQuickSort(int*a ,int lo , int hi ){
+    if(hi <= lo) //退出条件
+        return;
+    int j = Partition(a, lo , hi);  //切分完之后a[j]已经是在它正确的位置了
+    RecursionQuickSort(a , lo , j-1); //将a[lo...j-1]排序
+    RecursionQuickSort(a , j+1 , hi); //将a[j+1...hi]排序
+}
+
+void QuickSort(int *a , int N){
+    RecursionQuickSort(a , 0 , N -1);
+}
+
+//3向切分快速排序，对于有大量重复元素的数组，效果很好
+//如果重复元素不多，则运行效率不如普通快速排序
+void RecurQuick3Way(int*a , int lo , int hi){
+    if(lo >= hi) return;
+    int lt = lo , i = lo + 1 , gt = hi;
+    int v = a[lo];
+    while(i <= gt){
+        if(a[i] < v){
+            //exch(a, i , lt );
+            //++i; ++lt;
+            exch(a , i++ , lt++);
+        }
+        else if( a[i] > v){
+            //exch(a, i , gt);
+            //--gt;
+            exch(a , i , gt--);
+        }
+        else {
+            ++i;
+        }
+    }
+    RecurQuick3Way(a , lo , lt-1);
+    RecurQuick3Way(a , gt+1 , hi); 
+}
+
+void QuickSort3Way(int *a , int N){
+    RecurQuick3Way(a , 0 , N-1);
 }
 
 bool isSorted(int *a , int asize){
